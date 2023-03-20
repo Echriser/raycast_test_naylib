@@ -51,7 +51,10 @@ proc drawMap2D =
         drawRectangle(x * cubeSize, y * cubeSize, cubeSize, cubeSize, Gray)
 
 proc rayHits(point: Vector2): bool =
-  return map[int(point.y/cubeSize.float)*mapW+int(point.x/cubeSize.float)] == 1
+  try:
+    return map[int(point.y/cubeSize.float)*mapW+int(point.x/cubeSize.float)] == 1
+  except IndexDefect:
+    return true
 
 proc rayDist(pos: Vector2, ang: float): int32 =
   let start = pos
