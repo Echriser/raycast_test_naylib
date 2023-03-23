@@ -11,7 +11,7 @@ const
   recW: int32 = 10
 
 var
-  plypos = Vector2(x: 50,y: 50)
+  plypos = Vector2(x: 90,y: 90)
   plyang = 0.0
 
 var map = @[
@@ -24,21 +24,33 @@ var map = @[
   1,1,1,1,1,1,1
 ]
 
+proc `+`(a: Vector2, b: Vector2): Vector2 = 
+  Vector2(x: a.x + b.x, y: a.y + b.y)
+
+proc `-`(a: Vector2, b: Vector2): Vector2 = 
+  Vector2(x: a.x - b.x, y: a.y - b.y)
+
 proc `+=`(a: var Vector2, b: Vector2) =
-  a.x += b.x
-  a.y += b.y
+  a = a + b
 
 proc `-=`(a: var Vector2, b: Vector2) =
-  a.x -= b.x
-  a.y -= b.y
+  a = a - b
+
+proc vecCollides(point: Vector2): bool =
+  try:
+    return map[int(point.y/cubeSize.float)*mapW+int(point.x/cubeSize.float)] == 1
+  except IndexDefect:
+    return true
 
 proc drawPly =
   drawRectangle(int32 plypos.x - 7, int32 plypos.y - 7, int32 14, int32 14, Red)
 
 proc plyMove =
   var fwddir = Vector2(x: 0.5*sin(plyang * (PI/180)), y: 0.5*cos(plyang * (PI/180)))
-  if isKeyDown(W): plypos += fwddir
-  if isKeyDown(S): plypos -= fwddir
+  if isKeyDown(W) and not vecCollides(plypos + fwddir):
+      plypos += fwddir
+  if isKeyDown(S) and not vecCollides(plypos - fwddir):
+    plypos -= fwddir
   if isKeyDown(A): plyang += 5
   if isKeyDown(D): plyang -= 5
   if plyang >= 360 or plyang <= -360:
@@ -50,18 +62,12 @@ proc drawMap2D =
       if map[y*mapW+x] == 1:
         drawRectangle(x * cubeSize, y * cubeSize, cubeSize, cubeSize, Gray)
 
-proc rayHits(point: Vector2): bool =
-  try:
-    return map[int(point.y/cubeSize.float)*mapW+int(point.x/cubeSize.float)] == 1
-  except IndexDefect:
-    return true
-
 proc rayDist(pos: Vector2, ang: float): int32 =
   let start = pos
   var endP = Vector2(x: pos.x - raySize * -sin(ang*(PI/180)), y: pos.y - raySize * -cos(ang*(PI/180)))  
   
   var count:int32 = 0
-  while not rayHits(endP):
+  while not vecCollides(endP):
     endP += Vector2(x:raySize * sin(ang*(PI/180)), y: raySize * cos(ang*(PI/180)))  
     count += 1
 
