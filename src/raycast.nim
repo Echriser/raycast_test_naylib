@@ -43,7 +43,7 @@ proc vecCollides(point: Vector2): bool =
     return true
 
 proc drawPly =
-  drawRectangle(int32 plypos.x - 7, int32 plypos.y - 7, int32 14, int32 14, Red)
+  drawRectangle(int32(plypos.x) - 7, int32(plypos.y) - 7, 14, 14, Red)
 
 proc plyMove =
   var fwddir = Vector2(x: 0.5*sin(plyang * (PI/180)), y: 0.5*cos(plyang * (PI/180)))
@@ -68,7 +68,7 @@ proc rayDist(pos: Vector2, ang: float): int32 =
   
   var count:int32 = 0
   while not vecCollides(endP):
-    endP += Vector2(x:raySize * sin(ang*(PI/180)), y: raySize * cos(ang*(PI/180)))  
+    endP += Vector2(x: raySize * sin(ang*(PI/180)), y: raySize * cos(ang*(PI/180)))  
     count += 1
 
   drawLine(start, endP, Green)
@@ -77,7 +77,7 @@ proc rayDist(pos: Vector2, ang: float): int32 =
 proc drawMap3D =
   for i in -fov..fov:
     let dist = rayDist(plypos, plyang+i.float)
-    let col = Color(r: 100,g: 100, b: 200 - dist.uint8, a: 255)
+    let col = Color(r: 100, g: 100, b: 200 - dist.uint8, a: 255)
     drawRectangle((i+fov)*recW, int32(sHeight/2) - int32(sHeight/(dist+1)), recW, 4*int32(sHeight/(dist+1)), col)
 
 initWindow(sWidth, sHeight, "Raycast test")
